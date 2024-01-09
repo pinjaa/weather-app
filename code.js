@@ -1,0 +1,1 @@
+axios.defaults.baseURL = "https://api.open-meteo.com/v1/forecast?latitude=65.01&longitude=25.47&hourly=temperature_2m"
