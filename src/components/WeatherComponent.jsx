@@ -1,15 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { fetchWeatherApi } from 'openmeteo';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 
 const WeatherComponent = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [error, setError] = useState(null);
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   const URL = "https://api.open-meteo.com/v1/forecast";
 
-  useEffect(() => {
-    fetchData();
+  const options = {
+    chart: {
+      type: 'spline'
+    },
+    title: {
+      text: 'My chart'
+    },
     
+    series: [
+      {
+        data: [1, 2, 1, 4, 3, 6]
+      }
+    ]
+  };
+
+  useEffect(() => {
+    fetchData();   
   }, []);
 
   useEffect(() => {
@@ -83,23 +100,37 @@ const WeatherComponent = () => {
       console.error('Error fetching weather data:', error);
       setError('Error fetching weather data: ' + error.message);
     }
+
+    
   };
 
-  return (
-    <div>
-      {error ? (
-        <p>{error}</p>
-      ) : weatherData ? (
-        <div>
-          {/* Display metadata */}
-          <p>Temp: {weatherData.hourly.temperature2m[0]}</p>
-
-          <h2>Hourly Temperature:</h2>
+  return (   
+    <div class="h-screen mx-auto p-4 overflow-hidden">
+      {weatherData ? (
+        <div class="flex columns-2 gap-8">
+        <div className="w-1/3 p-4 bg-white rounded">
+        <h2 class="text-xl font-semibold mb-2">Current weather</h2>
+        <h2>{(weatherData.current.temperature2m).toFixed(1)}</h2>
+        <h3>{daysOfWeek[new Date(weatherData.current.time).getUTCDay()]} {new Date(weatherData.current.time).getUTCHours()}:{new Date(weatherData.current.time).getUTCMinutes()}</h3>
+        <h2>Wind speed {(weatherData.current.windSpeed10m).toFixed(1)}m/s</h2>
+        </div>
+        <div class="w-2/3 h-2/3 p-4 bg-white rounded">
+          <h2 class="text-xl font-semibold mb-2">Weekly highlight</h2>
+          <h2 class="text-xl font-semibold mb-2">Hourly Chart:</h2>
+          <div>
+            <HighchartsReact highcharts={Highcharts} options={options} />
+          </div>
           
         </div>
-      ) : (
-        <p>Loading...</p>
-      )}
+      </div>
+      ) 
+      : 
+      (
+        <p>Loading..</p>
+      )
+    }
+      
+      
     </div>
   );
 };

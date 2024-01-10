@@ -11,20 +11,22 @@ function App() {
   
 
   return (
-    <>
+    <div class="container w-100 h-100 bg-neutral-200 p-4 overflow-hidden">
     <header>
-      <h1>Weather </h1>
+      <div>
+        <h1 class="text-2xl font-bold text-left">Weather</h1>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">C</button>
+        <button class="bg-white-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded">F</button>
+      </div>
+    
     </header>
     <div>
-      <div>
-        <h1 className="text-3xl font-bold underline text-center">Current weather</h1>
-      </div>
       <div>
       <WeatherComponent />
       </div>
     </div>
       
-    </>
+    </div>
   )
 }
 
