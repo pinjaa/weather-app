@@ -1,35 +1,66 @@
 import React from 'react';
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useRef } from 'react'
 import './App.css'
 import WeatherComponent from './components/WeatherComponent';
 
 function App() {
-  const [temperatureUnit, setTemperatureUnit] = useState('Celsius');
+  const [temperatureUnit, setTemperatureUnit] = useState('celsius');
+  const weatherComponentRef = useRef(null); 
 
-  function toggleTemperatureUnit() {
-    setTemperatureUnit((prevUnit) => (prevUnit === 'Celsius' ? 'Fahrenheit' : 'Celsius'));
+  const setTemperatureCelsius = () => {
+    if(temperatureUnit !== 'celsius') {
+      setTemperatureUnit('celsius');
+    }
+  }
+  
+  const setTemperatureFahrenheit = () => {
+    if(temperatureUnit !== 'fahrenheit') {
+      setTemperatureUnit('fahrenheit');
+    }
   }
 
-  
+  const handleFetchData = () => {
+    weatherComponentRef.current.fetchData();
+  };
 
   return (
-    <div class="container w-100 h-100 bg-neutral-200 p-4 overflow-hidden">
-    <header>
+    <div className="container w-100 h-100 bg-neutral-200 p-4 overflow-hidden">
+      <header >      
+          <h1 className="text-2xl font-bold text-left">Weather</h1>
+          <div className='flex justify-end'>
+            <button 
+              className="bg-white active:bg-blue-500 text-black font-bold py-2 px-4 rounded-md border-solid border-2 border-blue-500"
+              onClick={handleFetchData}
+            >
+              Refresh
+            </button>
+            <button
+              style={{
+                backgroundColor: temperatureUnit === 'celsius' ? '#4299e1' : 'white',
+                color: temperatureUnit === 'celsius' ? 'white' : 'black',
+              }}
+              className="focus:bg-blue-500 text-black font-bold py-2 px-4 rounded-md border-solid border-2 border-blue-500  mx-2"
+              onClick={setTemperatureCelsius}
+            >
+              &deg;C
+            </button>
+            <button
+              style={{
+                backgroundColor: temperatureUnit === 'fahrenheit' ? '#4299e1' : 'white',
+                color: temperatureUnit === 'fahrenheit' ? 'white' : 'black',
+              }}
+              className="focus:bg-blue-500 text-black font-bold py-2 px-4 rounded-md border-solid border-2 border-blue-500 mr-2"
+              onClick={setTemperatureFahrenheit}
+            >
+              &deg;F
+            </button>
+          </div>
+      </header>
       <div>
-        <h1 class="text-2xl font-bold text-left">Weather</h1>
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={toggleTemperatureUnit}>C</button>
-        <button class="bg-white-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded">F</button>
-      </div>
-    
-    </header>
-    <div>
-      <div>
-      <WeatherComponent />
-      </div>
-    </div>
-      
+        <div>
+        <WeatherComponent ref={weatherComponentRef} temperatureUnit={temperatureUnit}/>
+        </div>
+      </div>   
     </div>
   )
 }
