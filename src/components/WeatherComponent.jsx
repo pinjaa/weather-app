@@ -2,28 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { fetchWeatherApi } from 'openmeteo';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import App from '../App';
 
 const WeatherComponent = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [error, setError] = useState(null);
   const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
+  const [options, setOptions] = useState()
+  
   const URL = "https://api.open-meteo.com/v1/forecast";
 
-  const options = {
-    chart: {
-      type: 'spline'
-    },
-    title: {
-      text: 'My chart'
-    },
-    
-    series: [
-      {
-        data: [1, 2, 1, 4, 3, 6]
-      }
-    ]
-  };
 
   useEffect(() => {
     fetchData();   
@@ -33,7 +21,9 @@ const WeatherComponent = () => {
     // Log data when weatherData changes
     if (weatherData) {
       console.log("response:", weatherData);
+      console.log("response:", weatherData.hourly.time[0]);
     }
+      
   }, [weatherData]);
 
   function range(start, end, step) {
@@ -42,6 +32,49 @@ const WeatherComponent = () => {
       result.push(i);
     }
     return result;
+  }
+
+  function convertTemperature(temperature) {
+    if (temperatureUnit === 'Fahrenheit') {
+      // Convert Celsius to Fahrenheit
+      return (temperature * 9) / 5 + 32;
+    }
+    return temperature;
+  }
+
+  const setOptionsForHighchart = () => {
+
+    const gradientColors = Highcharts.getOptions().colors.map(color => Highcharts.color(color).setOpacity(0).get());
+
+    setOptions( {
+      chart: {
+        type: 'spline',
+      },
+      title: {
+        text: 'Hourly Chart',
+      },
+      xAxis: {
+        type: 'datetime',
+        labels: {
+          format: '{value:%b %e, %H:%M}',
+        },
+      },
+      yAxis: {
+        title: {
+          text: 'Temperature',
+        },
+      },
+      series: [
+        {
+          name: 'Temperature',
+          data: weatherData.hourly.time.map((timestamp, index) => ({
+            x: new Date(timestamp).getTime(),
+            y: weatherData.hourly.temperature2m[index],
+          })),
+        },
+      ],      
+    });
+  
   }
   
   const fetchData = async () => {
@@ -91,6 +124,7 @@ const WeatherComponent = () => {
           
         };
         setWeatherData(tempData);
+        setOptionsForHighchart();
       }
       else {
         setError('Invalid weather data format.');
@@ -110,13 +144,12 @@ const WeatherComponent = () => {
         <div class="flex columns-2 gap-8">
         <div className="w-1/3 p-4 bg-white rounded">
         <h2 class="text-xl font-semibold mb-2">Current weather</h2>
-        <h2>{(weatherData.current.temperature2m).toFixed(1)}</h2>
+        <h2>{convertTemperature(weatherData.current.temperature2m).toFixed(1)}</h2>
         <h3>{daysOfWeek[new Date(weatherData.current.time).getUTCDay()]} {new Date(weatherData.current.time).getUTCHours()}:{new Date(weatherData.current.time).getUTCMinutes()}</h3>
         <h2>Wind speed {(weatherData.current.windSpeed10m).toFixed(1)}m/s</h2>
         </div>
         <div class="w-2/3 h-2/3 p-4 bg-white rounded">
           <h2 class="text-xl font-semibold mb-2">Weekly highlight</h2>
-          <h2 class="text-xl font-semibold mb-2">Hourly Chart:</h2>
           <div>
             <HighchartsReact highcharts={Highcharts} options={options} />
           </div>

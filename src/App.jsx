@@ -6,8 +6,12 @@ import './App.css'
 import WeatherComponent from './components/WeatherComponent';
 
 function App() {
-  const BASE_URL = "https://api.open-meteo.com/v1/forecast?latitude=65.01&longitude=25.47";
-  const url = "&hourly=temperature_2m";
+  const [temperatureUnit, setTemperatureUnit] = useState('Celsius');
+
+  function toggleTemperatureUnit() {
+    setTemperatureUnit((prevUnit) => (prevUnit === 'Celsius' ? 'Fahrenheit' : 'Celsius'));
+  }
+
   
 
   return (
@@ -15,7 +19,7 @@ function App() {
     <header>
       <div>
         <h1 class="text-2xl font-bold text-left">Weather</h1>
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">C</button>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={toggleTemperatureUnit}>C</button>
         <button class="bg-white-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded">F</button>
       </div>
     
